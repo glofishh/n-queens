@@ -11,6 +11,7 @@
         console.log('Good guess! But to use the Board() constructor, you must pass it an argument in one of the following formats:');
         console.log('\t1. An object. To create an empty board of size n:\n\t\t{n: %c<num>%c} - Where %c<num> %cis the dimension of the (empty) board you wish to instantiate\n\t\t%cEXAMPLE: var board = new Board({n:5})', 'color: blue;', 'color: black;', 'color: blue;', 'color: black;', 'color: grey;');
         console.log('\t2. An array of arrays (a matrix). To create a populated board of size n:\n\t\t[ [%c<val>%c,%c<val>%c,%c<val>%c...], [%c<val>%c,%c<val>%c,%c<val>%c...], [%c<val>%c,%c<val>%c,%c<val>%c...] ] - Where each %c<val>%c is whatever value you want at that location on the board\n\t\t%cEXAMPLE: var board = new Board([[1,0,0],[0,1,0],[0,0,1]])', 'color: blue;', 'color: black;', 'color: blue;', 'color: black;', 'color: blue;', 'color: black;', 'color: blue;', 'color: black;', 'color: blue;', 'color: black;', 'color: blue;', 'color: black;', 'color: blue;', 'color: black;', 'color: blue;', 'color: black;', 'color: blue;', 'color: black;', 'color: blue;', 'color: black;', 'color: grey;');
+        console.log('poop')
       } else if (params.hasOwnProperty('n')) {
         this.set(makeEmptyMatrix(this.get('n')));
       } else {
@@ -21,6 +22,7 @@
     rows: function() {
       return _(_.range(this.get('n'))).map(function(rowIndex) {
         return this.get(rowIndex);
+
       }, this);
     },
 
@@ -79,29 +81,61 @@
     //
     // test if a specific row on this board contains a conflict
     hasRowConflictAt: function(rowIndex) {
-      return false; // fixme
+      var allRows = this.rows();
+      var row = allRows[rowIndex];
+      var sum = 0;
+      for (var i = 0; i < row.length; i++) {
+        sum += row[i];
+      }
+      return (sum>1) ? true: false;
+
+    // fixme
     },
 
     // test if any rows on this board contain conflicts
     hasAnyRowConflicts: function() {
+      
+      var allRows = this.rows();
+      for (var i=0; i<allRows.length; i++){
+        if (this.hasRowConflictAt(i)) {
+          return true;
+        }
+      }
       return false; // fixme
     },
 
-
+    // [0, 1, 0, 0],
+    // [0, 0, 0, 0],
+    // [0, 0, 0, 0],
+    // [0, 1, 0, 0]
 
     // COLUMNS - run from top to bottom
     // --------------------------------------------------------------
     //
     // test if a specific column on this board contains a conflict
     hasColConflictAt: function(colIndex) {
-      return false; // fixme
+      var allRows = this.rows(); 
+      
+      var column = [];
+      for (var row of allRows){
+        column.push(row[colIndex]);
+      }
+
+      return (column.reduce((acc,e)=> acc+e,0) >1) ? true : false;
+
     },
 
     // test if any columns on this board contain conflicts
     hasAnyColConflicts: function() {
-      return false; // fixme
-    },
+      var allRows = this.rows();
 
+      for (var i = 0; i < allRows.length; i++) {
+        if (this.hasColConflictAt(i)) {
+          return true;
+        }
+      }
+      return false;
+    },
 
 
     // Major Diagonals - go from top-left to bottom-right
@@ -109,12 +143,34 @@
     //
     // test if a specific major diagonal on this board contains a conflict
     hasMajorDiagonalConflictAt: function(majorDiagonalColumnIndexAtFirstRow) {
-      return false; // fixme
+      var colIndex = majorDiagonalColumnIndexAtFirstRow;
+      var allRows = this.rows();
+      var l = allRows.length;
+      
+      var sum = 0;
+      for (var i=0; i<l; i++){
+        
+        if (allRows[i][colIndex] !== undefined){
+          sum += allRows[i][colIndex]
+        } 
+        colIndex++;
+      }
+
+      return (sum > 1) ? true : false;
     },
 
     // test if any major diagonals on this board contain conflicts
     hasAnyMajorDiagonalConflicts: function() {
-      return false; // fixme
+      
+      var allRows = this.rows();
+      var l = allRows.length;
+
+      for (var i=0; i<l; i++){
+        if (this.hasMajorDiagonalConflictAt(i)){
+          return true;
+        }
+      }
+      return false;
     },
 
 
@@ -146,3 +202,8 @@
   };
 
 }());
+
+console.log('test board below');
+var test = new Board({n: 4});
+// console.log(test);
+console.log(test.rows());
